@@ -1,0 +1,1404 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>会计真相·第一重：概念构建者</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #1a237e 0%, #283593 50%, #3949ab 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            margin-top: 20px;
+            margin-bottom: 30px;
+            padding: 30px;
+            position: relative;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px dashed #3949ab;
+        }
+        h1 {
+            color: #1a237e;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+        .subtitle {
+            color: #5c6bc0;
+            font-size: 1.2rem;
+            font-weight: normal;
+        }
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            background: #e8eaf6;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        .info-item {
+            text-align: center;
+            flex: 1;
+            min-width: 120px;
+        }
+        .info-label {
+            font-size: 0.9rem;
+            color: #5c6bc0;
+        }
+        .info-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #1a237e;
+        }
+        .screen {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        .screen.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .screen h2 {
+            color: #303f9f;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #c5cae9;
+        }
+        .screen p {
+            line-height: 1.6;
+            margin-bottom: 15px;
+            color: #444;
+        }
+        .question {
+            background: #f5f7ff;
+            border-left: 5px solid #3949ab;
+            padding: 20px;
+            border-radius: 0 10px 10px 0;
+            margin: 25px 0;
+        }
+        .question-title {
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #1a237e;
+            font-size: 1.1rem;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .option {
+            background: white;
+            border: 2px solid #c5cae9;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+        }
+        .option:hover {
+            background: #e8eaf6;
+            border-color: #7986cb;
+        }
+        .option.selected {
+            background: #e3f2fd;
+            border-color: #2196f3;
+        }
+        .option.correct {
+            background: #e8f5e9;
+            border-color: #4caf50;
+        }
+        .option.incorrect {
+            background: #ffebee;
+            border-color: #f44336;
+        }
+        .option-prefix {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            line-height: 28px;
+            text-align: center;
+            background: #3949ab;
+            color: white;
+            border-radius: 50%;
+            margin-right: 12px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        .feedback {
+            padding: 20px;
+            background: #e8eaf6;
+            border-radius: 10px;
+            margin-top: 25px;
+            display: none;
+        }
+        .feedback.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        .feedback-title {
+            font-weight: bold;
+            color: #1a237e;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .feedback-title i {
+            margin-right: 10px;
+        }
+        .reward {
+            background: linear-gradient(to right, #fff8e1, #ffecb3);
+            border: 2px dashed #ffb300;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 25px;
+            text-align: center;
+            display: none;
+        }
+        .reward.show {
+            display: block;
+            animation: fadeIn 0.8s ease;
+        }
+        .reward-icon {
+            font-size: 2.5rem;
+            color: #ff8f00;
+            margin-bottom: 10px;
+        }
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #c5cae9;
+        }
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn i {
+            margin-right: 8px;
+        }
+        .btn-primary {
+            background: linear-gradient(to right, #3949ab, #283593);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(to right, #303f9f, #1a237e);
+            transform: translateY(-3px);
+            box-shadow: 0 7px 14px rgba(0, 0, 0, 0.2);
+        }
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #424242;
+        }
+        .btn-secondary:hover {
+            background: #bdbdbd;
+        }
+        .btn-success {
+            background: linear-gradient(to right, #43a047, #2e7d32);
+            color: white;
+        }
+        .btn-success:hover {
+            background: linear-gradient(to right, #388e3c, #1b5e20);
+            transform: translateY(-3px);
+        }
+        .btn:disabled {
+            background: #bdbdbd;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .progress-bar {
+            height: 10px;
+            background: #c5cae9;
+            border-radius: 5px;
+            margin: 25px 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #00c853, #64dd17);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 5px;
+        }
+        .matching-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .matching-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .matching-item {
+            flex: 1;
+            min-width: 200px;
+            background: white;
+            border: 2px solid #c5cae9;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            color: #1a237e;
+        }
+        .matching-connector {
+            font-size: 1.5rem;
+            color: #5c6bc0;
+        }
+        .matching-select {
+            padding: 10px;
+            border-radius: 5px;
+            border: 2px solid #c5cae9;
+            background: white;
+            color: #1a237e;
+            font-weight: bold;
+            min-width: 250px;
+        }
+        .final-screen {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        .trophy {
+            font-size: 5rem;
+            color: #ffd700;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        .badge {
+            display: inline-block;
+            background: linear-gradient(to right, #3949ab, #5c6bc0);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-weight: bold;
+            margin: 20px 0;
+            font-size: 1.3rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        footer {
+            text-align: center;
+            color: #c5cae9;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+            .game-info {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .info-item {
+                min-width: 100%;
+            }
+            .matching-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .matching-connector {
+                align-self: center;
+                transform: rotate(90deg);
+            }
+            .controls {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-search-dollar"></i> 会计真相·第一重：概念构建者</h1>
+            <p class="subtitle">基于《会计学原理》总论的互动式学习游戏</p>
+        </header>
+        
+        <div class="game-info">
+            <div class="info-item">
+                <div class="info-label">当前关卡</div>
+                <div class="info-value" id="current-level">1</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">游戏进度</div>
+                <div class="info-value" id="progress-percent">0%</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">获得技能</div>
+                <div class="info-value" id="skills-count">0</div>
+            </div>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        
+        <!-- 欢迎屏幕 -->
+        <div class="screen active" id="screen-welcome">
+            <h2><i class="fas fa-door-open"></i> 欢迎，审计助理！</h2>
+            <p>你是一名新入职的审计助理，公司收到一份匿名举报，称某家企业财务信息可疑。你的导师<strong>刘鑫</strong>为你提供了《会计学原理》总论，作为调查的理论基础。</p>
+            <div class="question">
+                <p class="question-title">你必须掌握这些知识，才能看穿迷雾，发现真相。游戏共有四个关卡，每个关卡都对应一个核心会计概念。</p>
+                <p>准备好接受挑战了吗？请点击下方按钮开始你的调查。</p>
+            </div>
+            <div class="controls">
+                <button class="btn btn-primary" id="start-game">
+                    <i class="fas fa-play"></i> 开始调查
+                </button>
+            </div>
+        </div>
+        
+        <!-- 第一关屏幕 -->
+        <div class="screen" id="screen-level1">
+            <h2><i class="fas fa-hat-wizard"></i> 第一关：基石试炼</h2>
+            <p><strong>关卡目标</strong>：理解会计的基本职能、目标与核心假设。</p>
+            <p><strong>情景</strong>：在调查开始前，你需要通过基础理论测试，证明自己具备了合格的职业素养。</p>
+            
+            <div class="question">
+                <p class="question-title">1. 安然、世通、康美药业等财务丑闻，直接动摇了资本市场的信任，这凸显了会计信息的哪个根本要求？</p>
+                <div class="options" id="q1-options">
+                    <div class="option" data-option="A">
+                        <span class="option-prefix">A</span>
+                        <span>相关性</span>
+                    </div>
+                    <div class="option" data-option="B">
+                        <span class="option-prefix">B</span>
+                        <span>可靠性</span>
+                    </div>
+                    <div class="option" data-option="C">
+                        <span class="option-prefix">C</span>
+                        <span>可理解性</span>
+                    </div>
+                    <div class="option" data-option="D">
+                        <span class="option-prefix">D</span>
+                        <span>及时性</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="question">
+                <p class="question-title">2. 连线题：请将以下会计基本假设与描述连线。</p>
+                <div class="matching-container">
+                    <div class="matching-row">
+                        <div class="matching-item">(A) 会计主体假设</div>
+                        <div class="matching-connector"><i class="fas fa-arrow-right"></i></div>
+                        <select class="matching-select" id="match-a">
+                            <option value="">请选择对应描述</option>
+                            <option value="1">1. 假定企业不会破产清算，资产按历史成本计价而非清算价值</option>
+                            <option value="2">2. 以货币为主要计量单位，并假设币值稳定</option>
+                            <option value="3">3. 界定会计核算的空间范围，区分公司账与老板个人账</option>
+                            <option value="4">4. 将连续经营划分为月、季、年，以便定期出财报</option>
+                        </select>
+                    </div>
+                    <div class="matching-row">
+                        <div class="matching-item">(B) 持续经营假设</div>
+                        <div class="matching-connector"><i class="fas fa-arrow-right"></i></div>
+                        <select class="matching-select" id="match-b">
+                            <option value="">请选择对应描述</option>
+                            <option value="1">1. 假定企业不会破产清算，资产按历史成本计价而非清算价值</option>
+                            <option value="2">2. 以货币为主要计量单位，并假设币值稳定</option>
+                            <option value="3">3. 界定会计核算的空间范围，区分公司账与老板个人账</option>
+                            <option value="4">4. 将连续经营划分为月、季、年，以便定期出财报</option>
+                        </select>
+                    </div>
+                    <div class="matching-row">
+                        <div class="matching-item">(C) 会计分期假设</div>
+                        <div class="matching-connector"><i class="fas fa-arrow-right"></i></div>
+                        <select class="matching-select" id="match-c">
+                            <option value="">请选择对应描述</option>
+                            <option value="1">1. 假定企业不会破产清算，资产按历史成本计价而非清算价值</option>
+                            <option value="2">2. 以货币为主要计量单位，并假设币值稳定</option>
+                            <option value="3">3. 界定会计核算的空间范围，区分公司账与老板个人账</option>
+                            <option value="4">4. 将连续经营划分为月、季、年，以便定期出财报</option>
+                        </select>
+                    </div>
+                    <div class="matching-row">
+                        <div class="matching-item">(D) 货币计量假设</div>
+                        <div class="matching-connector"><i class="fas fa-arrow-right"></i></div>
+                        <select class="matching-select" id="match-d">
+                            <option value="">请选择对应描述</option>
+                            <option value="1">1. 假定企业不会破产清算，资产按历史成本计价而非清算价值</option>
+                            <option value="2">2. 以货币为主要计量单位，并假设币值稳定</option>
+                            <option value="3">3. 界定会计核算的空间范围，区分公司账与老板个人账</option>
+                            <option value="4">4. 将连续经营划分为月、季、年，以便定期出财报</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="question">
+                <p class="question-title">3. 你查看目标公司账目，发现一笔去年12月的销售收入，货物已于12月发出，但货款今年1月才收到。公司将其记为1月的收入。这种做法违背了哪个会计基础？</p>
+                <div class="options" id="q3-options">
+                    <div class="option" data-option="A">
+                        <span class="option-prefix">A</span>
+                        <span>收付实现制</span>
+                    </div>
+                    <div class="option" data-option="B">
+                        <span class="option-prefix">B</span>
+                        <span>权责发生制</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="feedback" id="feedback-level1">
+                <div class="feedback-title"><i class="fas fa-comment-dots"></i> 通关反馈</div>
+                <p id="feedback-text-level1"></p>
+            </div>
+            
+            <div class="reward" id="reward-level1">
+                <div class="reward-icon"><i class="fas fa-eye"></i></div>
+                <h3>获得技能：【职业怀疑眼光】</h3>
+                <p>在后续审查中对收入确认时点保持警惕。</p>
+            </div>
+            
+            <div class="controls">
+                <button class="btn btn-secondary" id="back-welcome">
+                    <i class="fas fa-arrow-left"></i> 返回
+                </button>
+                <button class="btn btn-primary" id="check-level1" disabled>
+                    <i class="fas fa-check-circle"></i> 提交答案
+                </button>
+                <button class="btn btn-success" id="next-level1" disabled>
+                    下一关 <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- 第二关屏幕 -->
+        <div class="screen" id="screen-level2">
+            <h2><i class="fas fa-balance-scale"></i> 第二关：框架构筑</h2>
+            <p><strong>关卡目标</strong>：掌握六大会计要素，并理解会计恒等式的恒等性。</p>
+            <p><strong>情景</strong>：你拿到了目标公司一份简化的资产负债表草稿，需要检查其内在逻辑。</p>
+            
+            <div class="question">
+                <p class="question-title">1. 归类题：请将以下项目拖拽到正确的会计要素类别中。</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin: 20px 0;">
+                    <div class="matching-item draggable" draggable="true" data-item="银行存款">银行存款</div>
+                    <div class="matching-item draggable" draggable="true" data-item="短期借款">向银行借入的短期借款</div>
+                    <div class="matching-item draggable" draggable="true" data-item="投入资本">投资者投入的资本</div>
+                    <div class="matching-item draggable" draggable="true" data-item="销售货款">销售商品取得的货款</div>
+                    <div class="matching-item draggable" draggable="true" data-item="管理人员工资">支付给管理人员的工资</div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; margin-top: 30px;">
+                    <div class="drop-zone" data-category="资产">
+                        <h4>资产</h4>
+                        <div class="drop-area"></div>
+                    </div>
+                    <div class="drop-zone" data-category="负债">
+                        <h4>负债</h4>
+                        <div class="drop-area"></div>
+                    </div>
+                    <div class="drop-zone" data-category="所有者权益">
+                        <h4>所有者权益</h4>
+                        <div class="drop-area"></div>
+                    </div>
+                    <div class="drop-zone" data-category="收入">
+                        <h4>收入</h4>
+                        <div class="drop-area"></div>
+                    </div>
+                    <div class="drop-zone" data-category="费用">
+                        <h4>费用</h4>
+                        <div class="drop-area"></div>
+                    </div>
+                </div>
+                <p style="margin-top: 15px; font-size: 0.9rem; color: #666;"><i class="fas fa-info-circle"></i> 提示：拖拽上方项目到对应类别框中</p>
+            </div>
+            
+            <div class="question">
+                <p class="question-title">2. 等式平衡题：已知目标公司期初：资产=100万，负债=40万，所有者权益=60万。</p>
+                <p>本月发生业务：①用银行存款20万购买设备；②取得销售收入30万（款项已收）；③发生广告费5万（用存款支付）。</p>
+                <p>请计算业务发生后的会计等式。</p>
+                
+                <div style="background: #f0f4ff; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                    <div style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
+                        <input type="number" id="asset-input" placeholder="资产" style="padding: 10px; border: 2px solid #c5cae9; border-radius: 5px; width: 120px; text-align: center;">
+                        <span>=</span>
+                        <input type="number" id="liability-input" placeholder="负债" style="padding: 10px; border: 2px solid #c5cae9; border-radius: 5px; width: 120px; text-align: center;">
+                        <span>+</span>
+                        <input type="number" id="equity-input" placeholder="所有者权益" style="padding: 10px; border: 2px solid #c5cae9; border-radius: 5px; width: 120px; text-align: center;">
+                    </div>
+                    <p style="text-align: center; color: #5c6bc0;">提示：新所有者权益 = 期初60万 + 利润(收入-费用)</p>
+                </div>
+            </div>
+            
+            <div class="feedback" id="feedback-level2">
+                <div class="feedback-title"><i class="fas fa-comment-dots"></i> 通关反馈</div>
+                <p id="feedback-text-level2"></p>
+            </div>
+            
+            <div class="reward" id="reward-level2">
+                <div class="reward-icon"><i class="fas fa-eye"></i></div>
+                <h3>解锁技能：【恒等之眼】</h3>
+                <p>能快速洞察财务报表数字间的内在勾稽关系。</p>
+            </div>
+            
+            <div class="controls">
+                <button class="btn btn-secondary" id="back-level1">
+                    <i class="fas fa-arrow-left"></i> 返回上一关
+                </button>
+                <button class="btn btn-primary" id="check-level2" disabled>
+                    <i class="fas fa-check-circle"></i> 提交答案
+                </button>
+                <button class="btn btn-success" id="next-level2" disabled>
+                    下一关 <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- 第三关屏幕 -->
+        <div class="screen" id="screen-level3">
+            <h2><i class="fas fa-filter"></i> 第三关：质量甄别</h2>
+            <p><strong>关卡目标</strong>：运用会计信息质量要求，识别不当会计处理。</p>
+            <p><strong>情景</strong>：在分析目标公司财务数据时，你发现了几处令人费解的操作。</p>
+            
+            <div class="question">
+                <p class="question-title">1. 目标公司签订了一份售后回购协议，以高价卖出设备并承诺半年后以略高于原价的价格购回。法律上完成了销售，但公司几乎承担了设备的所有风险和报酬。公司将其全额确认为当期销售收入。这违背了哪项质量要求？</p>
+                <div class="options" id="q1-level3-options">
+                    <div class="option" data-option="A">
+                        <span class="option-prefix">A</span>
+                        <span>重要性</span>
+                    </div>
+                    <div class="option" data-option="B">
+                        <span class="option-prefix">B</span>
+                        <span>谨慎性</span>
+                    </div>
+                    <div class="option" data-option="C">
+                        <span class="option-prefix">C</span>
+                        <span>实质重于形式</span>
+                    </div>
+                    <div class="option" data-option="D">
+                        <span class="option-prefix">D</span>
+                        <span>可比性</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="question">
+                <p class="question-title">2. 为了提高本期利润，目标公司对一批可能发生跌价的存货，故意不计提减值准备。这违背了哪项质量要求？</p>
+                <div class="options" id="q2-level3-options">
+                    <div class="option" data-option="A">
+                        <span class="option-prefix">A</span>
+                        <span>可靠性</span>
+                    </div>
+                    <div class="option" data-option="B">
+                        <span class="option-prefix">B</span>
+                        <span>谨慎性</span>
+                    </div>
+                    <div class="option" data-option="C">
+                        <span class="option-prefix">C</span>
+                        <span>及时性</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="feedback" id="feedback-level3">
+                <div class="feedback-title"><i class="fas fa-comment-dots"></i> 通关反馈</div>
+                <p id="feedback-text-level3"></p>
+            </div>
+            
+            <div class="reward" id="reward-level3">
+                <div class="reward-icon"><i class="fas fa-search-plus"></i></div>
+                <h3>获得道具：【质量放大镜】</h3>
+                <p>能看穿会计处理背后的经济实质，而非被表面形式迷惑。</p>
+            </div>
+            
+            <div class="controls">
+                <button class="btn btn-secondary" id="back-level2">
+                    <i class="fas fa-arrow-left"></i> 返回上一关
+                </button>
+                <button class="btn btn-primary" id="check-level3" disabled>
+                    <i class="fas fa-check-circle"></i> 提交答案
+                </button>
+                <button class="btn btn-success" id="next-level3" disabled>
+                    下一关 <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- 第四关屏幕 -->
+        <div class="screen" id="screen-level4">
+            <h2><i class="fas fa-chart-line"></i> 第四关：终极洞察</h2>
+            <p><strong>关卡目标</strong>：结合财报，形成初步调查结论。</p>
+            <p><strong>情景</strong>：你整合了所有线索，准备撰写初步分析报告。</p>
+            
+            <div class="question">
+                <p class="question-title">综合挑战：回顾"美团2025Q2财报"数据（营收增长11.7%，但经营利润暴跌98%），并对比会计的"决策有用观"和"受托责任观"。</p>
+                
+                <div style="background: #fff8e1; padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 5px solid #ffb300;">
+                    <h4><i class="fas fa-chart-bar"></i> 财报数据摘要</h4>
+                    <ul style="margin: 15px 0 15px 20px;">
+                        <li>营业收入：同比增长11.7%</li>
+                        <li>经营利润：同比下降98%</li>
+                        <li>销售成本与营销开支：同比大幅上升</li>
+                    </ul>
+                </div>
+                
+                <div class="question">
+                    <p class="question-title">1. 这份财报更侧重于满足哪种会计目标？为什么？</p>
+                    <textarea id="answer-q1-level4" rows="4" placeholder="请在此输入您的分析..." style="width: 100%; padding: 15px; border: 2px solid #c5cae9; border-radius: 8px; font-family: inherit; font-size: 1rem; margin-top: 10px;"></textarea>
+                </div>
+                
+                <div class="question">
+                    <p class="question-title">2. 作为调查员，基于此财报，你会重点关注哪些非财务信息或下一步调查方向？</p>
+                    <textarea id="answer-q2-level4" rows="4" placeholder="请在此输入您的分析..." style="width: 100%; padding: 15px; border: 2px solid #c5cae9; border-radius: 8px; font-family: inherit; font-size: 1rem; margin-top: 10px;"></textarea>
+                </div>
+            </div>
+            
+            <div class="feedback" id="feedback-level4">
+                <div class="feedback-title"><i class="fas fa-comment-dots"></i> 参考答案与分析</div>
+                <p id="feedback-text-level4"></p>
+            </div>
+            
+            <div class="controls">
+                <button class="btn btn-secondary" id="back-level3">
+                    <i class="fas fa-arrow-left"></i> 返回上一关
+                </button>
+                <button class="btn btn-primary" id="check-level4">
+                    <i class="fas fa-check-circle"></i> 提交分析
+                </button>
+            </div>
+        </div>
+        
+        <!-- 最终通关屏幕 -->
+        <div class="screen" id="screen-final">
+            <div class="final-screen">
+                <div class="trophy">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <h2>恭喜通关！</h2>
+                <div class="badge">初阶财务侦探</div>
+                <p style="max-width: 700px; margin: 20px auto;">你成功构建了会计核心概念框架，并具备了初步的财务分析思维。会计不仅是一套技术规则，更是理解商业世界的语言。希望这个游戏能帮助你更好地掌握这门语言的语法基础。</p>
+                
+                <div style="background: #f5f7ff; padding: 25px; border-radius: 15px; margin: 30px 0; text-align: left;">
+                    <h3><i class="fas fa-star"></i> 通关总结</h3>
+                    <ul style="margin: 15px 0 15px 20px;">
+                        <li>掌握了会计的四大基本假设与核算基础</li>
+                        <li>理解了会计要素与会计恒等式的内在平衡</li>
+                        <li>学会了运用会计信息质量要求识别不当处理</li>
+                        <li>具备了初步的财报分析与职业怀疑能力</li>
+                    </ul>
+                </div>
+                
+                <div class="controls">
+                    <button class="btn btn-primary" id="restart-game">
+                        <i class="fas fa-redo"></i> 重新开始游戏
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>基于《会计学原理》第一章"总论"设计的互动学习游戏 | 仅供学习使用</p>
+    </footer>
+
+    <script>
+        // 游戏状态管理
+        const gameState = {
+            currentLevel: 1,
+            progress: 0,
+            skills: 0,
+            scores: {
+                level1: 0,
+                level2: 0,
+                level3: 0,
+                level4: 0
+            },
+            answers: {
+                level1: {
+                    q1: null,
+                    matching: { A: "", B: "", C: "", D: "" },
+                    q3: null
+                },
+                level2: {
+                    classification: {},
+                    equation: { assets: "", liabilities: "", equity: "" }
+                },
+                level3: {
+                    q1: null,
+                    q2: null
+                },
+                level4: {
+                    q1: "",
+                    q2: ""
+                }
+            }
+        };
+
+        // 正确答案配置
+        const correctAnswers = {
+            level1: {
+                q1: "B",
+                matching: { A: "3", B: "1", C: "4", D: "2" },
+                q3: "B"
+            },
+            level2: {
+                classification: {
+                    "银行存款": "资产",
+                    "短期借款": "负债",
+                    "投入资本": "所有者权益",
+                    "销售货款": "收入",
+                    "管理人员工资": "费用"
+                },
+                equation: { assets: "105", liabilities: "40", equity: "85" }
+            },
+            level3: {
+                q1: "C",
+                q2: "B"
+            }
+        };
+
+        // 屏幕管理
+        const screens = {
+            welcome: document.getElementById('screen-welcome'),
+            level1: document.getElementById('screen-level1'),
+            level2: document.getElementById('screen-level2'),
+            level3: document.getElementById('screen-level3'),
+            level4: document.getElementById('screen-level4'),
+            final: document.getElementById('screen-final')
+        };
+
+        // 显示指定屏幕
+        function showScreen(screenId) {
+            Object.values(screens).forEach(screen => {
+                screen.classList.remove('active');
+            });
+            screens[screenId].classList.add('active');
+        }
+
+        // 更新游戏状态显示
+        function updateGameDisplay() {
+            document.getElementById('current-level').textContent = gameState.currentLevel;
+            document.getElementById('progress-percent').textContent = `${gameState.progress}%`;
+            document.getElementById('skills-count').textContent = gameState.skills;
+            document.getElementById('progress-fill').style.width = `${gameState.progress}%`;
+        }
+
+        // 计算进度
+        function calculateProgress() {
+            let totalQuestions = 0;
+            let answered = 0;
+            
+            // 第一关
+            if (gameState.answers.level1.q1) answered++;
+            totalQuestions++;
+            
+            const matching = gameState.answers.level1.matching;
+            if (matching.A && matching.B && matching.C && matching.D) answered++;
+            totalQuestions++;
+            
+            if (gameState.answers.level1.q3) answered++;
+            totalQuestions++;
+            
+            // 第二关
+            const classification = gameState.answers.level2.classification;
+            const classifiedItems = Object.keys(classification).length;
+            answered += Math.min(classifiedItems / 5, 1);
+            totalQuestions++;
+            
+            const equation = gameState.answers.level2.equation;
+            if (equation.assets && equation.liabilities && equation.equity) answered++;
+            totalQuestions++;
+            
+            // 第三关
+            if (gameState.answers.level3.q1) answered++;
+            totalQuestions++;
+            if (gameState.answers.level3.q2) answered++;
+            totalQuestions++;
+            
+            // 第四关
+            if (gameState.answers.level4.q1.trim()) answered += 0.5;
+            if (gameState.answers.level4.q2.trim()) answered += 0.5;
+            totalQuestions++;
+            
+            gameState.progress = Math.round((answered / totalQuestions) * 100);
+            updateGameDisplay();
+        }
+
+        // 第一关逻辑
+        function initLevel1() {
+            // 选择题选项点击事件
+            document.querySelectorAll('#q1-options .option, #q3-options .option').forEach(option => {
+                option.addEventListener('click', function() {
+                    const questionId = this.closest('.options').id;
+                    const optionsContainer = document.getElementById(questionId);
+                    
+                    // 移除其他选项的选中状态
+                    optionsContainer.querySelectorAll('.option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    
+                    // 选中当前选项
+                    this.classList.add('selected');
+                    
+                    // 保存答案
+                    const answer = this.getAttribute('data-option');
+                    if (questionId === 'q1-options') {
+                        gameState.answers.level1.q1 = answer;
+                    } else if (questionId === 'q3-options') {
+                        gameState.answers.level1.q3 = answer;
+                    }
+                    
+                    // 更新提交按钮状态
+                    updateLevel1SubmitButton();
+                    calculateProgress();
+                });
+            });
+            
+            // 连线题选择事件
+            document.querySelectorAll('.matching-select').forEach(select => {
+                select.addEventListener('change', function() {
+                    const id = this.id;
+                    const letter = id.replace('match-', '').toUpperCase();
+                    gameState.answers.level1.matching[letter] = this.value;
+                    updateLevel1SubmitButton();
+                    calculateProgress();
+                });
+            });
+            
+            // 返回按钮
+            document.getElementById('back-welcome').addEventListener('click', function() {
+                showScreen('welcome');
+            });
+            
+            // 提交答案按钮
+            document.getElementById('check-level1').addEventListener('click', checkLevel1Answers);
+            
+            // 下一关按钮
+            document.getElementById('next-level1').addEventListener('click', function() {
+                gameState.currentLevel = 2;
+                showScreen('level2');
+                updateGameDisplay();
+                initLevel2();
+            });
+        }
+
+        // 更新第一关提交按钮状态
+        function updateLevel1SubmitButton() {
+            const btn = document.getElementById('check-level1');
+            const answers = gameState.answers.level1;
+            
+            if (answers.q1 && answers.q3 && 
+                answers.matching.A && answers.matching.B && 
+                answers.matching.C && answers.matching.D) {
+                btn.disabled = false;
+            } else {
+                btn.disabled = true;
+            }
+        }
+
+        // 检查第一关答案
+        function checkLevel1Answers() {
+            const answers = gameState.answers.level1;
+            const correct = correctAnswers.level1;
+            let score = 0;
+            let feedback = "";
+            
+            // 检查第一题
+            if (answers.q1 === correct.q1) {
+                score++;
+                document.querySelector(`#q1-options .option[data-option="${answers.q1}"]`).classList.add('correct');
+            } else {
+                document.querySelector(`#q1-options .option[data-option="${answers.q1}"]`).classList.add('incorrect');
+                document.querySelector(`#q1-options .option[data-option="${correct.q1}"]`).classList.add('correct');
+            }
+            
+            // 检查连线题
+            let matchingCorrect = 0;
+            for (const letter in answers.matching) {
+                if (answers.matching[letter] === correct.matching[letter]) {
+                    matchingCorrect++;
+                }
+            }
+            score += matchingCorrect / 4;
+            
+            // 检查第三题
+            if (answers.q3 === correct.q3) {
+                score++;
+                document.querySelector(`#q3-options .option[data-option="${answers.q3}"]`).classList.add('correct');
+            } else {
+                document.querySelector(`#q3-options .option[data-option="${answers.q3}"]`).classList.add('incorrect');
+                document.querySelector(`#q3-options .option[data-option="${correct.q3}"]`).classList.add('correct');
+            }
+            
+            // 计算得分并显示反馈
+            gameState.scores.level1 = Math.round((score / 3) * 100);
+            
+            if (gameState.scores.level1 >= 80) {
+                feedback = `优秀！你答对了${Math.round(score)}/3题，得分${gameState.scores.level1}。正确！真实、可靠的会计信息是基石，造假会带来灾难性后果。根据权责发生制，收入应在"赚取"时确认，而非"收款"时。这可能是操纵利润时间的信号。`;
+                document.getElementById('reward-level1').classList.add('show');
+                gameState.skills++;
+                updateGameDisplay();
+            } else if (gameState.scores.level1 >= 60) {
+                feedback = `良好！你答对了${Math.round(score)}/3题，得分${gameState.scores.level1}。大部分概念掌握正确，但还需要加强对会计基础假设的理解。`;
+            } else {
+                feedback = `需要继续努力！你答对了${Math.round(score)}/3题，得分${gameState.scores.level1}。建议回顾会计基本假设、会计信息质量要求和权责发生制等基础概念。`;
+            }
+            
+            document.getElementById('feedback-text-level1').textContent = feedback;
+            document.getElementById('feedback-level1').classList.add('show');
+            document.getElementById('check-level1').disabled = true;
+            document.getElementById('next-level1').disabled = false;
+        }
+
+        // 第二关逻辑
+        function initLevel2() {
+            // 拖拽功能
+            const draggables = document.querySelectorAll('.draggable');
+            const dropZones = document.querySelectorAll('.drop-zone');
+            let draggedItem = null;
+            
+            draggables.forEach(item => {
+                item.addEventListener('dragstart', function() {
+                    draggedItem = this;
+                    setTimeout(() => this.style.display = 'none', 0);
+                });
+                
+                item.addEventListener('dragend', function() {
+                    setTimeout(() => this.style.display = 'block', 0);
+                    draggedItem = null;
+                });
+            });
+            
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    this.querySelector('.drop-area').style.backgroundColor = '#e8eaf6';
+                });
+                
+                zone.addEventListener('dragleave', function() {
+                    this.querySelector('.drop-area').style.backgroundColor = '';
+                });
+                
+                zone.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    const dropArea = this.querySelector('.drop-area');
+                    dropArea.style.backgroundColor = '';
+                    
+                    if (draggedItem) {
+                        // 检查是否已存在相同项目
+                        const existingItem = dropArea.querySelector(`[data-item="${draggedItem.getAttribute('data-item')}"]`);
+                        if (existingItem) {
+                            existingItem.remove();
+                        }
+                        
+                        // 克隆并添加新项目
+                        const clonedItem = draggedItem.cloneNode(true);
+                        clonedItem.style.margin = '5px';
+                        clonedItem.style.cursor = 'default';
+                        clonedItem.draggable = false;
+                        clonedItem.addEventListener('click', function() {
+                            this.remove();
+                            delete gameState.answers.level2.classification[this.getAttribute('data-item')];
+                            updateLevel2SubmitButton();
+                            calculateProgress();
+                        });
+                        
+                        dropArea.appendChild(clonedItem);
+                        
+                        // 保存答案
+                        const category = this.getAttribute('data-category');
+                        const itemName = draggedItem.getAttribute('data-item');
+                        gameState.answers.level2.classification[itemName] = category;
+                        
+                        updateLevel2SubmitButton();
+                        calculateProgress();
+                    }
+                });
+            });
+            
+            // 等式输入事件
+            document.querySelectorAll('#asset-input, #liability-input, #equity-input').forEach(input => {
+                input.addEventListener('input', function() {
+                    const id = this.id;
+                    const value = this.value;
+                    
+                    if (id === 'asset-input') gameState.answers.level2.equation.assets = value;
+                    if (id === 'liability-input') gameState.answers.level2.equation.liabilities = value;
+                    if (id === 'equity-input') gameState.answers.level2.equation.equity = value;
+                    
+                    updateLevel2SubmitButton();
+                    calculateProgress();
+                });
+            });
+            
+            // 返回按钮
+            document.getElementById('back-level1').addEventListener('click', function() {
+                gameState.currentLevel = 1;
+                showScreen('level1');
+                updateGameDisplay();
+            });
+            
+            // 提交答案按钮
+            document.getElementById('check-level2').addEventListener('click', checkLevel2Answers);
+            
+            // 下一关按钮
+            document.getElementById('next-level2').addEventListener('click', function() {
+                gameState.currentLevel = 3;
+                showScreen('level3');
+                updateGameDisplay();
+                initLevel3();
+            });
+        }
+
+        // 更新第二关提交按钮状态
+        function updateLevel2SubmitButton() {
+            const btn = document.getElementById('check-level2');
+            const classification = gameState.answers.level2.classification;
+            const equation = gameState.answers.level2.equation;
+            
+            if (Object.keys(classification).length === 5 && 
+                equation.assets && equation.liabilities && equation.equity) {
+                btn.disabled = false;
+            } else {
+                btn.disabled = true;
+            }
+        }
+
+        // 检查第二关答案
+        function checkLevel2Answers() {
+            const answers = gameState.answers.level2;
+            const correct = correctAnswers.level2;
+            let score = 0;
+            let feedback = "";
+            
+            // 检查归类题
+            let classificationCorrect = 0;
+            for (const item in answers.classification) {
+                if (answers.classification[item] === correct.classification[item]) {
+                    classificationCorrect++;
+                }
+            }
+            score += classificationCorrect / 5;
+            
+            // 检查等式题
+            let equationCorrect = 0;
+            if (answers.equation.assets === correct.equation.assets) equationCorrect++;
+            if (answers.equation.liabilities === correct.equation.liabilities) equationCorrect++;
+            if (answers.equation.equity === correct.equation.equity) equationCorrect++;
+            score += equationCorrect / 3;
+            
+            // 计算得分并显示反馈
+            gameState.scores.level2 = Math.round((score / 2) * 100);
+            
+            if (gameState.scores.level2 >= 80) {
+                feedback = `优秀！得分${gameState.scores.level2}。完美！你理解了经济业务不会破坏会计恒等式，只是改变其内部结构。计算过程：资产变化：-20（买设备）+30（收钱）-5（付费）= +5万。新资产=105万。负债不变：40万。收入-费用=30-5=25万（利润）。新所有者权益=期初60万+利润25万=85万。验证：105万=40万+85万。等式平衡！`;
+                document.getElementById('reward-level2').classList.add('show');
+                gameState.skills++;
+                updateGameDisplay();
+            } else if (gameState.scores.level2 >= 60) {
+                feedback = `良好！得分${gameState.scores.level2}。大部分归类正确，但等式计算有误。正确计算：资产=105万，负债=40万，所有者权益=85万。`;
+            } else {
+                feedback = `需要继续努力！得分${gameState.scores.level2}。建议回顾六大会计要素的分类和会计恒等式的计算。正确归类：银行存款-资产，短期借款-负债，投入资本-所有者权益，销售货款-收入，管理人员工资-费用。正确等式：资产105万=负债40万+所有者权益85万。`;
+            }
+            
+            document.getElementById('feedback-text-level2').textContent = feedback;
+            document.getElementById('feedback-level2').classList.add('show');
+            document.getElementById('check-level2').disabled = true;
+            document.getElementById('next-level2').disabled = false;
+        }
+
+        // 第三关逻辑
+        function initLevel3() {
+            // 选择题选项点击事件
+            document.querySelectorAll('#q1-level3-options .option, #q2-level3-options .option').forEach(option => {
+                option.addEventListener('click', function() {
+                    const questionId = this.closest('.options').id;
+                    const optionsContainer = document.getElementById(questionId);
+                    
+                    // 移除其他选项的选中状态
+                    optionsContainer.querySelectorAll('.option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    
+                    // 选中当前选项
+                    this.classList.add('selected');
+                    
+                    // 保存答案
+                    const answer = this.getAttribute('data-option');
+                    if (questionId === 'q1-level3-options') {
+                        gameState.answers.level3.q1 = answer;
+                    } else if (questionId === 'q2-level3-options') {
+                        gameState.answers.level3.q2 = answer;
+                    }
+                    
+                    // 更新提交按钮状态
+                    updateLevel3SubmitButton();
+                    calculateProgress();
+                });
+            });
+            
+            // 返回按钮
+            document.getElementById('back-level2').addEventListener('click', function() {
+                gameState.currentLevel = 2;
+                showScreen('level2');
+                updateGameDisplay();
+            });
+            
+            // 提交答案按钮
+            document.getElementById('check-level3').addEventListener('click', checkLevel3Answers);
+            
+            // 下一关按钮
+            document.getElementById('next-level3').addEventListener('click', function() {
+                gameState.currentLevel = 4;
+                showScreen('level4');
+                updateGameDisplay();
+                initLevel4();
+            });
+        }
+
+        // 更新第三关提交按钮状态
+        function updateLevel3SubmitButton() {
+            const btn = document.getElementById('check-level3');
+            const answers = gameState.answers.level3;
+            
+            if (answers.q1 && answers.q2) {
+                btn.disabled = false;
+            } else {
+                btn.disabled = true;
+            }
+        }
+
+        // 检查第三关答案
+        function checkLevel3Answers() {
+            const answers = gameState.answers.level3;
+            const correct = correctAnswers.level3;
+            let score = 0;
+            let feedback = "";
+            
+            // 检查第一题
+            if (answers.q1 === correct.q1) {
+                score++;
+                document.querySelector(`#q1-level3-options .option[data-option="${answers.q1}"]`).classList.add('correct');
+            } else {
+                document.querySelector(`#q1-level3-options .option[data-option="${answers.q1}"]`).classList.add('incorrect');
+                document.querySelector(`#q1-level3-options .option[data-option="${correct.q1}"]`).classList.add('correct');
+            }
+            
+            // 检查第二题
+            if (answers.q2 === correct.q2) {
+                score++;
+                document.querySelector(`#q2-level3-options .option[data-option="${answers.q2}"]`).classList.add('correct');
+            } else {
+                document.querySelector(`#q2-level3-options .option[data-option="${answers.q2}"]`).classList.add('incorrect');
+                document.querySelector(`#q2-level3-options .option[data-option="${correct.q2}"]`).classList.add('correct');
+            }
+            
+            // 计算得分并显示反馈
+            gameState.scores.level3 = Math.round((score / 2) * 100);
+            
+            if (gameState.scores.level3 >= 80) {
+                feedback = `优秀！你答对了${score}/2题，得分${gameState.scores.level3}。正确！经济实质（融资行为）重于法律形式（销售合同），应作为融资租赁处理而非销售。谨慎性要求不应高估资产或收益，不应低估负债或费用。对可能发生的损失应予以估计并确认。`;
+                document.getElementById('reward-level3').classList.add('show');
+                gameState.skills++;
+                updateGameDisplay();
+            } else if (gameState.scores.level3 >= 60) {
+                feedback = `良好！你答对了${score}/2题，得分${gameState.scores.level3}。基本掌握了会计信息质量要求的应用。`;
+            } else {
+                feedback = `需要继续努力！你答对了${score}/2题，得分${gameState.scores.level3}。建议回顾"实质重于形式"和"谨慎性"原则的具体应用场景。`;
+            }
+            
+            document.getElementById('feedback-text-level3').textContent = feedback;
+            document.getElementById('feedback-level3').classList.add('show');
+            document.getElementById('check-level3').disabled = true;
+            document.getElementById('next-level3').disabled = false;
+        }
+
+        // 第四关逻辑
+        function initLevel4() {
+            // 文本输入事件
+            document.getElementById('answer-q1-level4').addEventListener('input', function() {
+                gameState.answers.level4.q1 = this.value;
+                calculateProgress();
+            });
+            
+            document.getElementById('answer-q2-level4').addEventListener('input', function() {
+                gameState.answers.level4.q2 = this.value;
+                calculateProgress();
+            });
+            
+            // 返回按钮
+            document.getElementById('back-level3').addEventListener('click', function() {
+                gameState.currentLevel = 3;
+                showScreen('level3');
+                updateGameDisplay();
+            });
+            
+            // 提交分析按钮
+            document.getElementById('check-level4').addEventListener('click', checkLevel4Answers);
+        }
+
+        // 检查第四关答案
+        function checkLevel4Answers() {
+            const answers = gameState.answers.level4;
+            let feedback = "";
+            
+            // 参考答案
+            const referenceAnswer1 = "这份同时呈现增长与暴跌的数据，更侧重于**决策有用观**。它不仅展示了过去的经营成果（营收增长），更通过利润的巨幅波动，向投资者预警了公司盈利模式、成本控制或市场竞争可能出现的**重大变化**，有助于投资者评估未来风险和收益，做出投资决策。而受托责任观下，如此剧烈的利润波动可能更侧重于是对管理层当期经营绩效的严厉'判决'。";
+            
+            const referenceAnswer2 = "我会重点关注：①导致销售成本与营销开支激增的具体原因（如新业务投入、价格战、监管变化）；②这种利润结构变化是短期策略还是长期趋势；③公司管理层对上述情况的解释及未来计划。这需要查阅财报附注、管理层讨论与分析以及行业新闻。";
+            
+            // 简单评估答案质量（基于长度和关键词）
+            const answer1Quality = evaluateAnswerQuality(answers.q1, ["决策有用观", "相关性", "预测", "未来", "风险", "收益", "投资决策"]);
+            const answer2Quality = evaluateAnswerQuality(answers.q2, ["销售成本", "营销开支", "原因", "趋势", "管理层", "解释", "计划", "附注", "行业"]);
+            
+            feedback = `<p><strong>问题1参考答案：</strong> ${referenceAnswer1}</p>`;
+            feedback += `<p><strong>你的答案评估：</strong> ${answer1Quality}</p>`;
+            feedback += `<hr style="margin: 15px 0; border-color: #c5cae9;">`;
+            feedback += `<p><strong>问题2参考答案：</strong> ${referenceAnswer2}</p>`;
+            feedback += `<p><strong>你的答案评估：</strong> ${answer2Quality}</p>`;
+            feedback += `<hr style="margin: 15px 0; border-color: #c5cae9;">`;
+            feedback += `<p style="margin-top: 15px;"><strong>总结：</strong> 你已成功完成所有关卡！会计不仅是一套技术规则，更是理解商业世界的语言。希望这个游戏能帮助你更好地掌握这门语言的语法基础。</p>`;
+            
+            document.getElementById('feedback-text-level4').innerHTML = feedback;
+            document.getElementById('feedback-level4').classList.add('show');
+            
+            // 标记第四关完成并显示最终屏幕
+            gameState.scores.level4 = Math.round((answer1Quality.score + answer2Quality.score) / 2);
+            setTimeout(() => {
+                showScreen('final');
+                gameState.currentLevel = 5;
+                gameState.progress = 100;
+                gameState.skills = 4;
+                updateGameDisplay();
+            }, 3000);
+        }
+
+        // 评估答案质量
+        function evaluateAnswerQuality(answer, keywords) {
+            if (!answer || answer.trim().length < 20) {
+                return { text: "答案过短，请提供更详细的分析。", score: 50 };
+            }
+            
+            let keywordCount = 0;
+            const lowerAnswer = answer.toLowerCase();
+            
+            keywords.forEach(keyword => {
+                if (lowerAnswer.includes(keyword.toLowerCase())) {
+                    keywordCount++;
+                }
+            });
+            
+            const keywordRatio = keywordCount / keywords.length;
+            
+            if (keywordRatio >= 0.7) {
+                return { text: "分析全面，抓住了问题的关键点。", score: 90 };
+            } else if (keywordRatio >= 0.4) {
+                return { text: "分析基本正确，但可以更深入。", score: 75 };
+            } else {
+                return { text: "分析需要更贴近问题核心。", score: 60 };
+            }
+        }
+
+        // 初始化游戏
+        function initGame() {
+            // 开始游戏按钮
+            document.getElementById('start-game').addEventListener('click', function() {
+                showScreen('level1');
+                initLevel1();
+            });
+            
+            // 重新开始游戏按钮
+            document.getElementById('restart-game').addEventListener('click', function() {
+                // 重置游戏状态
+                gameState.currentLevel = 1;
+                gameState.progress = 0;
+                gameState.skills = 0;
+                gameState.scores = { level1: 0, level2: 0, level3: 0, level4: 0 };
+                gameState.answers = {
+                    level1: { q1: null, matching: { A: "", B: "", C: "", D: "" }, q3: null },
+                    level2: { classification: {}, equation: { assets: "", liabilities: "", equity: "" } },
+                    level3: { q1: null, q2: null },
+                    level4: { q1: "", q2: "" }
+                };
+                
+                // 重置UI
+                document.querySelectorAll('.option').forEach(opt => {
+                    opt.classList.remove('selected', 'correct', 'incorrect');
+                });
+                
+                document.querySelectorAll('.matching-select').forEach(select => {
+                    select.value = "";
+                });
+                
+                document.querySelectorAll('.drop-area').forEach(area => {
+                    area.innerHTML = '';
+                });
+                
+                document.getElementById('asset-input').value = "";
+                document.getElementById('liability-input').value = "";
+                document.getElementById('equity-input').value = "";
+                document.getElementById('answer-q1-level4').value = "";
+                document.getElementById('answer-q2-level4').value = "";
+                
+                document.querySelectorAll('.feedback').forEach(fb => {
+                    fb.classList.remove('show');
+                });
+                
+                document.querySelectorAll('.reward').forEach(reward => {
+                    reward.classList.remove('show');
+                });
+                
+                showScreen('welcome');
+                updateGameDisplay();
+            });
+            
+            // 初始显示
+            updateGameDisplay();
+        }
+
+        // 页面加载完成后初始化游戏
+        document.addEventListener('DOMContentLoaded', initGame);
+    </script>
+</body>
+</html>
